@@ -13,6 +13,8 @@ using AutoMapper;
 using System.Threading;
 using HRM.Core.Extensions;
 using HRM.API.ViewModels;
+using Microsoft.EntityFrameworkCore;
+using HRM_BE.ViewModels;
 
 namespace HRM.API.Controllers
 {
@@ -34,11 +36,20 @@ namespace HRM.API.Controllers
 
         [HttpGet]
         [Route("current")]
-        [ProducesResponseType(typeof(UserViewModel), statusCode:200)]
+        [ProducesResponseType(typeof(SimpleUserViewModel), statusCode:200)]
         public async Task<IActionResult> GetCurrentUser(CancellationToken token)
         {
             var user = await _userManager.FindByIdAsync(User.GetId());
-            return Ok(_mapper.Map<UserViewModel>(user));
+            return Ok(_mapper.Map<SimpleUserViewModel>(user));
+        }
+
+        [HttpGet]
+        [ProducesResponseType(typeof(List<UserViewModel>), 200)]
+        public async Task<IActionResult> GetUser(CancellationToken token)
+        {
+            var users = await _userManager.Users.ToListAsync(token);
+
+            return Ok(_mapper.Map<List<UserViewModel>>(users));
         }
     }
 }

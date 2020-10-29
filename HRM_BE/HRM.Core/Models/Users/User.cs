@@ -13,6 +13,7 @@ namespace HRM.Core.Models.Users
         public string LastName { get; set; }
         public string GoogleToken { get; set; }
         public virtual ICollection<TeamUser> TeamUsers { get; set; }
+        public virtual ICollection<UserAccountDomain> UserAccountDomains { get; set; }
         public virtual ICollection<IdentityUserRole<string>> UserRoles { get; set; }
     }
 }
