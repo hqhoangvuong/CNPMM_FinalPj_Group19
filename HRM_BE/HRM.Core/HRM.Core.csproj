@@ -6,7 +6,33 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Data\Migrations\" />
+    <Compile Remove="Migrations\20201020171446_mg02.cs" />
+    <Compile Remove="Migrations\20201020171446_mg02.Designer.cs" />
+    <Compile Remove="Migrations\20201028022243_mg3.cs" />
+    <Compile Remove="Migrations\20201028022243_mg3.Designer.cs" />
+    <Compile Remove="Migrations\20201029070203_mg4.cs" />
+    <Compile Remove="Migrations\20201029070203_mg4.Designer.cs" />
+    <Compile Remove="Migrations\20201029070400_mg4.cs" />
+    <Compile Remove="Migrations\20201029070400_mg4.Designer.cs" />
+    <Compile Remove="Migrations\20201029070539_mg5.cs" />
+    <Compile Remove="Migrations\20201029070539_mg5.Designer.cs" />
+    <Compile Remove="Migrations\20201029080104_mg06.cs" />
+    <Compile Remove="Migrations\20201029080104_mg06.Designer.cs" />
+    <Compile Remove="Migrations\20201029080126_mg06.cs" />
+    <Compile Remove="Migrations\20201029080126_mg06.Designer.cs" />
+    <Compile Remove="Migrations\20201029081109_mg6.cs" />
+    <Compile Remove="Migrations\20201029081109_mg6.Designer.cs" />
+    <Compile Remove="Migrations\20201029081236_mg6.cs" />
+    <Compile Remove="Migrations\20201029081236_mg6.Designer.cs" />
+    <Compile Remove="Migrations\20201029081513_mg6.cs" />
+    <Compile Remove="Migrations\20201029081513_mg6.Designer.cs" />
+    <Compile Remove="Migrations\20201029081911_mg6.cs" />
+    <Compile Remove="Migrations\20201029081911_mg6.Designer.cs" />
+    <Compile Remove="Migrations\20201029082018_mg6.cs" />
+    <Compile Remove="Migrations\20201029082018_mg6.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Repositories\" />
   </ItemGroup>
 
@@ -21,6 +47,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="3.1.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.9">

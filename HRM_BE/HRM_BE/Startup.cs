@@ -37,7 +37,10 @@ namespace HRM_BE
 
             services.AddDbContext<ApplicationDbContext>(options =>
             {
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"),
+                options
+                .UseLazyLoadingProxies()
+                .UseSqlServer(
+                    Configuration.GetConnectionString("DefaultConnection"),
                                     optionsBuilder => optionsBuilder.MigrationsAssembly("HRM.Core"));
             });
                 
