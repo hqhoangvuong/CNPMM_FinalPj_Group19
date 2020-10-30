@@ -20,6 +20,7 @@ namespace HRM.Core.Data
 
         public DbSet<Team> Teams { get; set; }
         public DbSet<AccountDomain> AccountDomains { get; set; }
+        public DbSet<Job> Jobs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -38,8 +39,10 @@ namespace HRM.Core.Data
             builder.Entity<UserAccountDomain>().HasKey(ut => new { ut.AccountDomainId, ut.UserId });
             builder.Entity<User>().HasMany(u => u.TeamUsers).WithOne().HasForeignKey(ut => ut.UserId);
             builder.Entity<User>().HasMany(u => u.UserAccountDomains).WithOne().HasForeignKey(ut => ut.UserId);
+            builder.Entity<User>().HasMany(u => u.Jobs).WithOne().HasForeignKey(ut => ut.UserId);
             builder.Entity<Team>().HasMany(u => u.Users).WithOne(tu => tu.Team).HasForeignKey(ut => ut.TeamId);
             builder.Entity<AccountDomain>().HasMany(u => u.Users).WithOne(tu => tu.AccountDomain).HasForeignKey(ut => ut.AccountDomainId);
+            
         }
     }
 }

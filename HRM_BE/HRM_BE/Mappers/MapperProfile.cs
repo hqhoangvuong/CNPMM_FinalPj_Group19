@@ -23,7 +23,8 @@ namespace HRM.API.Mappers
                     StartDate = ur.StartDate,
                     EndDate = ur.EndDate,
                     IsActive = ur.IsActive
-                })));
+                })))
+                .ForMember(vm => vm.Jobs, o => o.MapFrom(u => u.Jobs));
             CreateMap<Team, TeamViewModel>();
             CreateMap<User, SimpleUserViewModel>();
         }

@@ -7,16 +7,16 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
 WORKDIR /src
-COPY ["HRM_BE/HRM.API.csproj", "HRM_BE/"]
+COPY ["HRM_BE/HRM_BE.csproj", "HRM_BE/"]
 COPY ["HRM.Core/HRM.Core.csproj", "HRM.Core/"]
 COPY ["HRM.Service/HRM.Service.csproj", "HRM.Service/"]
-RUN dotnet restore "HRM_BE/HRM.API.csproj"
+RUN dotnet restore "HRM_BE/HRM_BE.csproj"
 COPY . .
 WORKDIR "/src/HRM_BE"
-RUN dotnet build "HRM.API.csproj" -c Release -o /app/build
+RUN dotnet build "HRM_BE.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "HRM.API.csproj" -c Release -o /app/publish
+RUN dotnet publish "HRM_BE.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app

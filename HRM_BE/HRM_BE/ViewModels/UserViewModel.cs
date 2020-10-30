@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HRM.Core.Models.Users;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -18,6 +19,7 @@ namespace HRM.API.ViewModels
         public string PhoneNumber { get; set; }
         public IList<TeamViewModel> Teams { get; set; }
         public IList<ProjectViewModel> Projects { get; set; }
+        public IList<Job> Jobs { get; set; }
         public IList<RoleViewModel> Roles { get; set; }
         public bool isDeleted { get; set; }
     }
