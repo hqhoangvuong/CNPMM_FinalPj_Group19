@@ -18,6 +18,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using HRM.Service.Services;
 using Microsoft.Extensions.Options;
+using HRM.API.Helpers;
 
 namespace HRM_BE
 {
@@ -107,6 +108,7 @@ namespace HRM_BE
                 };
             });
 
+            services.AddScoped<IImageWriter, ImageWriter>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAuthService, AuthService>();
 

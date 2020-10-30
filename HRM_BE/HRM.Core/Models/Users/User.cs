@@ -13,6 +13,7 @@ namespace HRM.Core.Models.Users
         public DateTime DoB { get; set; }
         public bool Gender { get; set; }
         public string GoogleToken { get; set; }
+        public bool IsHasAvatar { get; set; }
         public virtual ICollection<TeamUser> TeamUsers { get; set; }
         public virtual ICollection<UserAccountDomain> UserAccountDomains { get; set; }
         public virtual ICollection<IdentityUserRole<string>> UserRoles { get; set; }

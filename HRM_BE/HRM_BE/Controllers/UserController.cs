@@ -1,20 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Security.Claims;
+using System.Threading;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using AutoMapper;
 using HRM.Core.Data;
 using HRM.Core.Models.Users;
-using AutoMapper;
-using System.Threading;
 using HRM.Core.Extensions;
 using HRM.API.ViewModels;
-using Microsoft.EntityFrameworkCore;
 using HRM_BE.ViewModels;
+using HRM.API.Helpers;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration.UserSecrets;
+using System;
 
 namespace HRM.API.Controllers
 {
@@ -26,12 +26,14 @@ namespace HRM.API.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<User> _userManager;
         private readonly IMapper _mapper;
+        private readonly IImageWriter _imageWriter;
 
-        public UserController(ApplicationDbContext context, UserManager<User> userManager, IMapper mapper)
+        public UserController(ApplicationDbContext context, UserManager<User> userManager, IMapper mapper, IImageWriter imageWriter)
         {
             _context = context;
             _userManager = userManager;
             _mapper = mapper;
+            _imageWriter = imageWriter;
         }
 
         [HttpGet]
@@ -50,6 +52,43 @@ namespace HRM.API.Controllers
             var users = await _userManager.Users.ToListAsync(token);
 
             return Ok(_mapper.Map<List<UserViewModel>>(users));
+        }
+
+        [HttpPost]
+        [Route("uploadavatar")]
+        public async Task<IActionResult> UploadAvatar(IFormFile file)
+        {
+            if (file is null)
+                return BadRequest("You have nothing to do here!");
+
+            string userId = User.GetId();
+
+            var result =  await _imageWriter.UploadImage(file, userId);
+
+            if (result.Contains("Invalid image file") || result.Contains("An error has been occurred when server try to save the image"))
+                return BadRequest(result);
+
+            var user = await _userManager.FindByIdAsync(userId);
+            user.IsHasAvatar = true;
+
+            await _userManager.UpdateAsync(user);
+
+            return Ok("Save image for user successed!");
+        }
+
+        [HttpGet]
+        [Route("getavatar")]
+        public async Task<IActionResult> GetAvatar()
+        {
+            var user = await _userManager.FindByIdAsync(User.GetId());
+
+            if(user.IsHasAvatar)
+            {
+                Byte[] b = System.IO.File.ReadAllBytes("wwwroot\\avatar\\avatar_" + user.Id + ".image");   // You can use your own method over here.         
+                return File(b, "image/jpeg");
+            }
+
+            return BadRequest("Nothing to show here!");
         }
     }
 }

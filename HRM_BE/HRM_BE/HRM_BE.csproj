@@ -32,4 +32,8 @@
     <ProjectReference Include="..\HRM.Service\HRM.Service.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\avatar\" />
+  </ItemGroup>
+
 </Project>
