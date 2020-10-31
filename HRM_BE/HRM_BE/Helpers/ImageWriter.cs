@@ -34,7 +34,7 @@ namespace HRM.API.Helpers
         {
             string fileName;
 
-            string savePath = "wwwroot\\avatar";
+            string savePath = ImageProcessing.savePath;
             if (!Directory.Exists(savePath))
             {
                 Directory.CreateDirectory(savePath);

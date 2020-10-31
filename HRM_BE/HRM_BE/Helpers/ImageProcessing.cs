@@ -22,6 +22,8 @@ namespace HRM.API.Helpers
             unknown
         }
 
+        public static string savePath = "wwwroot/avatar";
+
         public static ImageFormat GetImageFormat(byte[] bytes)
         {
             var bmp = Encoding.ASCII.GetBytes("BM");     // BMP

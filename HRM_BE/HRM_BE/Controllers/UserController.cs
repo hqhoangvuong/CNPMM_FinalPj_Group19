@@ -84,7 +84,7 @@ namespace HRM.API.Controllers
 
             if(user.IsHasAvatar)
             {
-                Byte[] b = System.IO.File.ReadAllBytes("wwwroot\\avatar\\avatar_" + user.Id + ".image");   // You can use your own method over here.         
+                Byte[] b = System.IO.File.ReadAllBytes(ImageProcessing.savePath + "/avatar_" + user.Id + ".image");   // You can use your own method over here.         
                 return File(b, "image/jpeg");
             }
 
