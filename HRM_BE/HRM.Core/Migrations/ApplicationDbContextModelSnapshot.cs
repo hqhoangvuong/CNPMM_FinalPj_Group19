@@ -19,6 +19,128 @@ namespace HRM.Core.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+            modelBuilder.Entity("HRM.Core.Models.Timesheets.Activity", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("AccountDomainId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ActivityDescription")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Activities");
+                });
+
+            modelBuilder.Entity("HRM.Core.Models.Timesheets.TaskHour", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("TimeSheetTaskId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("WorkingDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("WorkingHour")
+                        .HasColumnType("decimal(18,6)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TimeSheetTaskId");
+
+                    b.ToTable("TaskHour");
+                });
+
+            modelBuilder.Entity("HRM.Core.Models.Timesheets.Timesheet", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsChange")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TotalHour")
+                        .HasColumnType("decimal(18,6)");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Timesheets");
+                });
+
+            modelBuilder.Entity("HRM.Core.Models.Timesheets.TimesheetTask", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("AccountDomainId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ActivityId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("Enabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDelete")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsEdit")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsHoliday")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsNew")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Task")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TimesheetId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountDomainId");
+
+                    b.HasIndex("ActivityId");
+
+                    b.HasIndex("TimesheetId");
+
+                    b.ToTable("TimesheetTasks");
+                });
+
             modelBuilder.Entity("HRM.Core.Models.Users.AccountDomain", b =>
                 {
                     b.Property<string>("Id")
@@ -141,6 +263,9 @@ namespace HRM.Core.Migrations
 
                     b.Property<string>("GoogleToken")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsHasAvatar")
+                        .HasColumnType("bit");
 
                     b.Property<string>("LastName")
                         .HasColumnType("nvarchar(max)");
@@ -352,6 +477,39 @@ namespace HRM.Core.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens");
+                });
+
+            modelBuilder.Entity("HRM.Core.Models.Timesheets.TaskHour", b =>
+                {
+                    b.HasOne("HRM.Core.Models.Timesheets.TimesheetTask", "Task")
+                        .WithMany("TaskHours")
+                        .HasForeignKey("TimeSheetTaskId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("HRM.Core.Models.Timesheets.Timesheet", b =>
+                {
+                    b.HasOne("HRM.Core.Models.Users.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("HRM.Core.Models.Timesheets.TimesheetTask", b =>
+                {
+                    b.HasOne("HRM.Core.Models.Users.AccountDomain", "AccountDomain")
+                        .WithMany()
+                        .HasForeignKey("AccountDomainId");
+
+                    b.HasOne("HRM.Core.Models.Timesheets.Activity", "Activity")
+                        .WithMany()
+                        .HasForeignKey("ActivityId");
+
+                    b.HasOne("HRM.Core.Models.Timesheets.Timesheet", "Timesheet")
+                        .WithMany("Tasks")
+                        .HasForeignKey("TimesheetId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("HRM.Core.Models.Users.Job", b =>

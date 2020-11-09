@@ -18,11 +18,14 @@ using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using HRM.Service.Services;
 using Microsoft.Extensions.Options;
+using HRM.API.Helpers;
 
 namespace HRM_BE
 {
     public class Startup
     {
+        readonly string FrontEnd = "_frontEnd";
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -43,7 +46,10 @@ namespace HRM_BE
                     Configuration.GetConnectionString("DefaultConnection"),
                                     optionsBuilder => optionsBuilder.MigrationsAssembly("HRM.Core"));
             });
-                
+
+            services.AddControllersWithViews().AddNewtonsoftJson(options => 
+            options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+            );
 
             //services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
             //    .AddEntityFrameworkStores<ApplicationDbContext>();
@@ -107,6 +113,7 @@ namespace HRM_BE
                 };
             });
 
+            services.AddScoped<IImageWriter, ImageWriter>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAuthService, AuthService>();
 
@@ -120,7 +127,7 @@ namespace HRM_BE
 
             services.AddCors(options =>
             {
-                options.AddPolicy("FrontEnd", builder =>
+                options.AddPolicy(name: FrontEnd, builder =>
                 {
                     builder
                         .AllowAnyOrigin()
@@ -148,6 +155,7 @@ namespace HRM_BE
             app.UseStaticFiles();
 
             app.UseRouting();
+            app.UseCors(FrontEnd);
 
             app.UseAuthentication();
             app.UseAuthorization();

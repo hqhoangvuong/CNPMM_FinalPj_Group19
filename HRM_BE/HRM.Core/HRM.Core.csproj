@@ -30,6 +30,24 @@
     <Compile Remove="Migrations\20201029081911_mg6.Designer.cs" />
     <Compile Remove="Migrations\20201029082018_mg6.cs" />
     <Compile Remove="Migrations\20201029082018_mg6.Designer.cs" />
+    <Compile Remove="Migrations\20201030131536_mg5.cs" />
+    <Compile Remove="Migrations\20201030131536_mg5.Designer.cs" />
+    <Compile Remove="Migrations\20201030154725_mg6.cs" />
+    <Compile Remove="Migrations\20201030154725_mg6.Designer.cs" />
+    <Compile Remove="Migrations\20201107134957_mg7.cs" />
+    <Compile Remove="Migrations\20201107134957_mg7.Designer.cs" />
+    <Compile Remove="Migrations\20201107135216_mg8.cs" />
+    <Compile Remove="Migrations\20201107135216_mg8.Designer.cs" />
+    <Compile Remove="Migrations\20201107140229_mg7.cs" />
+    <Compile Remove="Migrations\20201107140229_mg7.Designer.cs" />
+    <Compile Remove="Migrations\20201107140457_mg7.cs" />
+    <Compile Remove="Migrations\20201107140457_mg7.Designer.cs" />
+    <Compile Remove="Migrations\20201107141906_mg8.cs" />
+    <Compile Remove="Migrations\20201107141906_mg8.Designer.cs" />
+    <Compile Remove="Migrations\20201108093212_mg9.cs" />
+    <Compile Remove="Migrations\20201108093212_mg9.Designer.cs" />
+    <Compile Remove="Migrations\20201108094029_mg10.cs" />
+    <Compile Remove="Migrations\20201108094029_mg10.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
