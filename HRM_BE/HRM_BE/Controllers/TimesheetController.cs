@@ -48,14 +48,25 @@ namespace HRM.API.Controllers
             return Ok(timesheets);
         }
 
-        [HttpPost()]
-        [ProducesResponseType(204)]
+        [HttpPost("add")]
+        [ProducesResponseType(typeof(TimesheetRequestModel), (200))]
         public async Task<IActionResult> AddTimesheet([FromBody] TimesheetRequestModel model)
         {
-            var isExisted = _context.Timesheets.Any(o => o.Id == model.Id);
-            if (model.Id != null && !isExisted)
+
+
+            var result = await _context.Timesheets.FirstOrDefaultAsync(x => 
+                                    x.UserId == model.UserId && x.StartDate == model.StartDate && x.EndDate == model.EndDate ) ?? null;
+
+            if(result != null)
             {
-                // int currentId = Convert.ToInt32(_context.Timesheets.Max(t => t.Id)) + 1;
+                result.TotalHour = model.TotalHour;
+                result.Status = model.Status;
+                await _context.SaveChangesAsync();
+                return Ok(_mapper.Map<TimesheetRequestModel>(result));
+
+            }
+            else
+            {
                 Timesheet _model = new Timesheet()
                 {
                     UserId = User.GetId(),
@@ -64,13 +75,66 @@ namespace HRM.API.Controllers
                     TotalHour = model.TotalHour,
                     Status = model.Status
                 };
-
-                _context.Timesheets.Add(_model);
-                await _context.SaveChangesAsync();
-                return Ok(_model);
+                await _context.Timesheets.AddAsync(_model);
+                return Ok(_mapper.Map<TimesheetRequestModel>(_model));
             }
 
-            return BadRequest("Timesheet already existed");
+
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateTimesheet([FromRoute] int id, [FromBody] TimesheetRequestModel timesheet)
+        {
+            var savedSheet = await _context.Timesheets.FirstOrDefaultAsync(t => t.Id == id);
+
+            if (savedSheet == null)
+                return BadRequest();
+            else
+            {
+                savedSheet.StartDate = timesheet.StartDate;
+                savedSheet.EndDate = timesheet.EndDate;
+                savedSheet.TotalHour = timesheet.TotalHour;
+                savedSheet.Status = timesheet.Status;
+
+                foreach(var task in savedSheet.Tasks)
+                {
+                    _context.TimesheetTasks.Remove(task);
+                }
+
+                savedSheet.Tasks = new List<TimesheetTask>();
+
+                foreach(var task in timesheet.Tasks)
+                {
+                    TimesheetTask _task = new TimesheetTask()
+                    {
+                        TimesheetId = savedSheet.Id,
+                        AccountDomain = await _context.AccountDomains.FirstOrDefaultAsync(t => t.Id == task.AccountDomainId),
+                        Activity = await _context.Activities.FirstOrDefaultAsync(t => t.Id == task.ActivityId),
+                        Task = task.Task,
+                        StartDate = task.StartDate,
+                        EndDate = task.EndDate,
+                        TaskHours = new List<TaskHour>()
+                    };
+
+                    foreach(TaskHourRequestModel hour in task.TaskHours)
+                    {
+                        TaskHour _hour = new TaskHour()
+                        {
+                            WorkingDate = hour.WorkingDate,
+                            WorkingHour = hour.WorkingHour
+                        };
+
+                        _task.TaskHours.Add(_hour);
+                    }
+
+                    savedSheet.Tasks.Add(_task);
+                }
+
+                _context.Timesheets.Update(savedSheet);
+                await _context.SaveChangesAsync();
+            }
+            
+            return Ok(_mapper.Map<TimesheetViewModel>(savedSheet));
         }
 
         [HttpPost("task/{id}")]

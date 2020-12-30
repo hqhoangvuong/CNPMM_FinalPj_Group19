@@ -4,14 +4,16 @@ using HRM.Core.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace HRM.Core.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20201225182216_mg100")]
+    partial class mg100
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -274,9 +276,6 @@ namespace HRM.Core.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsHasAvatar")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsTeamLead")
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("IssuedDate")
