@@ -21,6 +21,7 @@ namespace HRM.Core.Data
 
         public DbSet<Team> Teams { get; set; }
         public DbSet<AccountDomain> AccountDomains { get; set; }
+        public DbSet<UserAccountDomain> UserAccountDomain { get; set; }
         public DbSet<Job> Jobs { get; set; }
         public DbSet<Timesheet> Timesheets { get; set; }
         public DbSet<Activity> Activities { get; set; }

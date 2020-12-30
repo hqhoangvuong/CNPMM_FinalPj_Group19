@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using HRM.API.RequestModel;
 
 namespace HRM.API.Controllers
 {
@@ -56,18 +57,20 @@ namespace HRM.API.Controllers
         }
 
         [HttpPost("[action]")]
-        public async Task<IActionResult> Register([FromBody] LoginRequest model)
+        public async Task<IActionResult> Register([FromBody] CreateUserModel newUser)
         {
+            var currentUserId = int.Parse(_userManager.Users.OrderByDescending(p => p.Id).FirstOrDefault().Id);
             if (ModelState.IsValid)
             {
                 var user = new User {
-                    Id = "1",
-                    UserName = "hqhoangvuong",
-                    Email = model.Email 
+                    Id = (currentUserId + 1).ToString(),
+                    UserName = newUser.Username,
+                    Email = newUser.Email,
+                    IsTeamLead = false
                 };
-                var result = await _userManager.CreateAsync(user, model.Password);
+                var result = await _userManager.CreateAsync(user, newUser.Password);
             }
-
+            
             return Ok();
         }
     }

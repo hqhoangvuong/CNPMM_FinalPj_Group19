@@ -48,25 +48,38 @@ namespace HRM.API.Controllers
             return Ok(timesheets);
         }
 
-        [HttpPost()]
+        [HttpPost("add")]
         [ProducesResponseType(typeof(TimesheetRequestModel), (200))]
         public async Task<IActionResult> AddTimesheet([FromBody] TimesheetRequestModel model)
         {
-            // var isExisted = _context.Timesheets.Any(o => o.Id == model.Id);
-            // if (model.Id != null && !isExisted)
-            // int currentId = Convert.ToInt32(_context.Timesheets.Max(t => t.Id)) + 1;
-            Timesheet _model = new Timesheet()
-            {
-                UserId = User.GetId(),
-                StartDate = model.StartDate,
-                EndDate = model.EndDate,
-                TotalHour = model.TotalHour,
-                Status = model.Status
-            };
 
-            _context.Timesheets.Add(_model);
-            await _context.SaveChangesAsync();
-            return Ok(_mapper.Map<TimesheetRequestModel>(_model));
+
+            var result = await _context.Timesheets.FirstOrDefaultAsync(x => 
+                                    x.UserId == model.UserId && x.StartDate == model.StartDate && x.EndDate == model.EndDate ) ?? null;
+
+            if(result != null)
+            {
+                result.TotalHour = model.TotalHour;
+                result.Status = model.Status;
+                await _context.SaveChangesAsync();
+                return Ok(_mapper.Map<TimesheetRequestModel>(result));
+
+            }
+            else
+            {
+                Timesheet _model = new Timesheet()
+                {
+                    UserId = User.GetId(),
+                    StartDate = model.StartDate,
+                    EndDate = model.EndDate,
+                    TotalHour = model.TotalHour,
+                    Status = model.Status
+                };
+                await _context.Timesheets.AddAsync(_model);
+                return Ok(_mapper.Map<TimesheetRequestModel>(_model));
+            }
+
+
         }
 
         [HttpPut("{id}")]

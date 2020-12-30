@@ -11,5 +11,6 @@ namespace HRM_BE.ViewModels
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Name => !string.IsNullOrEmpty(FirstName) || !string.IsNullOrEmpty(LastName) ? $" {FirstName} {LastName}" : Email;
+        public bool isTeamLead { get; set; }
     }
 }
