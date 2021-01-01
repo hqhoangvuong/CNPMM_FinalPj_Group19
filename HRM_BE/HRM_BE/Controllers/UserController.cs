@@ -54,6 +54,14 @@ namespace HRM.API.Controllers
             return Ok(_mapper.Map<List<UserViewModel>>(users));
         }
 
+        [HttpGet("currentfull")]
+        [ProducesResponseType(typeof(UserViewModel), 200)]
+        public async Task<IActionResult> GetCurrentUserFullInfo(CancellationToken token)
+        {
+            var user = await _userManager.FindByIdAsync(User.GetId());
+            return Ok(_mapper.Map<UserViewModel>(user));
+        }
+
         [HttpPost]
         [Route("uploadavatar")]
         public async Task<IActionResult> UploadAvatar(IFormFile file)

@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using HRM.API.RequestModel;
+using HRM.Core.Data;
 
 namespace HRM.API.Controllers
 {
@@ -25,13 +26,15 @@ namespace HRM.API.Controllers
         private readonly IUserService _userService;
         private readonly IAuthService _authService;
         private readonly UserManager<User> _userManager;
+        private readonly ApplicationDbContext _context;
         private readonly ILogger<AuthController> _logger;
 
-        public AuthController(IUserService userService, IAuthService authService, UserManager<User> userManager, ILogger<AuthController> logger)
+        public AuthController(IUserService userService, IAuthService authService, UserManager<User> userManager, ApplicationDbContext context,ILogger<AuthController> logger)
         {
             _userService = userService;
             _authService = authService;
             _userManager = userManager;
+            _context = context;
             _logger = logger;
         }
 
@@ -56,8 +59,8 @@ namespace HRM.API.Controllers
             }
         }
 
-        [HttpPost("[action]")]
-        public async Task<IActionResult> Register([FromBody] CreateUserModel newUser)
+        [HttpPost("Register/{accDomainId}")]
+        public async Task<IActionResult> Register([FromBody] CreateUserModel newUser, string accDomainId)
         {
             var currentUserId = int.Parse(_userManager.Users.OrderByDescending(p => p.Id).FirstOrDefault().Id);
             if (ModelState.IsValid)
@@ -68,10 +71,32 @@ namespace HRM.API.Controllers
                     Email = newUser.Email,
                     IsTeamLead = false
                 };
+
                 var result = await _userManager.CreateAsync(user, newUser.Password);
+
+                var usrAccDomain = new UserAccountDomain()
+                {
+                    AccountDomainId = accDomainId,
+                    UserId = user.Id,
+                    StartDate = DateTime.UtcNow,
+                    EndDate = new DateTime(2099, 1, 1),
+                    IsActive = true
+                };
+
+                var job = new Job()
+                {
+                    Id = (int.Parse(_context.Jobs.OrderByDescending(p => p.Id).FirstOrDefault().Id) + 1).ToString(),
+                    UserId = user.Id,
+                    JobTitle = "New Employee",
+                    Resource = "None"
+                };
+                
+                await _context.UserAccountDomain.AddAsync(usrAccDomain);
+                await _context.Jobs.AddAsync(job);
+                await _context.SaveChangesAsync();
+                return Ok(user);
             }
-            
-            return Ok();
+            return BadRequest("invaild user data");
         }
     }
 }

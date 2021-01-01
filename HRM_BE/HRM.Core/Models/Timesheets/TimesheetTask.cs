@@ -10,11 +10,9 @@ namespace HRM.Core.Models.Timesheets
     {
         public int Id { get; set; }
         public int TimesheetId { get; set; }
-
         public virtual Timesheet Timesheet { get; set; }
         public virtual AccountDomain AccountDomain {get;set;}
         public virtual Activity Activity { get; set; }
-
         public string Task { get; set; }
         public bool Enabled { get; set; } = true;
         public bool IsNew { get; set; } = true;
@@ -23,7 +21,6 @@ namespace HRM.Core.Models.Timesheets
         public bool IsHoliday { get; set; } = false;
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
-
         public virtual ICollection<TaskHour> TaskHours { get; set; }
     }
 }

@@ -26,6 +26,7 @@ namespace HRM.Core.Data
         public DbSet<Timesheet> Timesheets { get; set; }
         public DbSet<Activity> Activities { get; set; }
         public DbSet<TimesheetTask> TimesheetTasks { get; set; }
+        public DbSet<TaskHour> TaskHour { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using HRM.API.RequestModel;
 using HRM.API.ViewModels;
 using HRM.Core.Models.Timesheets;
 using HRM.Core.Models.Users;
@@ -29,6 +30,7 @@ namespace HRM.API.Mappers
             CreateMap<Team, TeamViewModel>();
             CreateMap<User, SimpleUserViewModel>();
             CreateMap<Timesheet, TimesheetViewModel>();
+            CreateMap<Timesheet, TimesheetRequestModel>();
             //    .ForMember(vm => vm.Tasks, o => o.MapFrom(u => u.Tasks.Select(tu => tu.Task))); 
             CreateMap<TimesheetTask, TimesheetTaskViewModel>();
             CreateMap<TaskHour, TaskHourViewModel>();
