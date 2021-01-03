@@ -18,6 +18,7 @@ namespace HRM.API.ViewModels
         public string Name => !string.IsNullOrEmpty(FirstName) || !string.IsNullOrEmpty(LastName) ? $" {FirstName} {LastName}" : Email;
         public bool Gender;
         public string Sex => Gender ? $"Male" : $"Female"; 
+        public DateTime DoB { get; set; }
         public string EmployeeCode { get; set; }
         public string PhoneNumber { get; set; }
         public string VietnameseName { get; set; }

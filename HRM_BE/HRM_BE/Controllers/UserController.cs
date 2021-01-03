@@ -15,6 +15,7 @@ using HRM.API.Helpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration.UserSecrets;
 using System;
+using System.Linq;
 
 namespace HRM.API.Controllers
 {
@@ -204,6 +205,93 @@ namespace HRM.API.Controllers
         {
             var user = await _userManager.FindByIdAsync(userId);
             return Ok(_mapper.Map<UserViewModel>(user));
+        }
+
+        [HttpPost("updateuserinfo")]
+        [ProducesResponseType(typeof(UserViewModel), statusCode: 204)]
+        public async Task<IActionResult> UpdateUserInfo([FromBody] UserViewModel request)
+        {
+            var user = await _userManager.FindByIdAsync(request.Id);
+
+            if(user != null)
+            {
+                user.FirstName = request.FirstName;
+                user.MiddleName = request.MiddleName;
+                user.LastName = request.LastName;
+                user.Nationality = request.Nationality;
+                user.DoB = request.DoB;
+                user.MaritalStatus = request.MaritalStatus;
+                user.Gender = request.Gender;
+                user.VietnameseName = request.VietnameseName;
+                user.EthnicRace = request.EthnicRace;
+                user.BirthplaceCity = request.BirthplaceCity;
+                user.IdCardNo = request.IdCardNo;
+                user.IssuedDate = request.IssuedDate;
+                user.IssuedPlace = request.IssuedPlace;
+
+                await _userManager.UpdateAsync(user);
+                return Ok(_mapper.Map<UserViewModel>(user));    
+            }
+            else
+            {
+                return BadRequest("User need to updated is not found");
+            }
+        }
+        [HttpPost("updateuserjob")]
+        [ProducesResponseType(typeof(Job), statusCode: 204)]
+        public async Task<IActionResult> UpdateUserJob([FromBody] Job request)
+        {
+            var job = await _context.Jobs.FirstOrDefaultAsync(x => x.Id == request.Id && x.UserId == request.UserId);
+
+            if (job != null)
+            {
+                job.JobTitle = request.JobTitle;
+                job.Resource = request.Resource;
+                job.Department = request.Department;
+                job.SeatingPlan = request.SeatingPlan;
+                job.WorkingOffice = request.WorkingOffice;
+                job.StartDate = request.StartDate;
+                job.EndDate = request.EndDate;
+                await _context.SaveChangesAsync();
+                return Ok(job);
+            }
+            else
+            {
+                return BadRequest("Job not found!");
+            }
+        }
+
+        [HttpPost("adduserjob")]
+        [ProducesResponseType(typeof(Job), statusCode: 204)]
+        public async Task<IActionResult> AddUserJob([FromBody] Job request)
+        {
+            var existedJobs = await _context.Jobs.Where(x => x.UserId == request.UserId).ToListAsync();
+            if(existedJobs != null)
+            {
+                foreach (var item in existedJobs)
+                {
+                    item.IsActive = false;
+                }       
+            }
+            await _context.SaveChangesAsync();
+
+            var job = new Job()
+            {
+                Id = (int.Parse(_context.Jobs.OrderByDescending(p => p.Id).FirstOrDefault().Id) + 1).ToString(),
+                UserId = request.Id,
+                JobTitle = request.JobTitle,
+                Resource = request.Resource,
+                Department = request.Department,
+                SeatingPlan = request.SeatingPlan,
+                WorkingOffice = request.WorkingOffice,
+                WorkLocation = request.WorkLocation,
+                Reason = request.Reason,
+                StartDate = request.StartDate,
+                EndDate = request.EndDate
+            };
+            await _context.Jobs.AddAsync(job);
+            await _context.SaveChangesAsync();
+            return Ok(job);
         }
     }
 }

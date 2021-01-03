@@ -67,6 +67,7 @@ namespace HRM.API.Controllers
             {
                 var user = new User {
                     Id = (currentUserId + 1).ToString(),
+                    EmployeeCode = newUser.EmployeeId,
                     UserName = newUser.Username,
                     Email = newUser.Email,
                     IsTeamLead = false
@@ -88,7 +89,10 @@ namespace HRM.API.Controllers
                     Id = (int.Parse(_context.Jobs.OrderByDescending(p => p.Id).FirstOrDefault().Id) + 1).ToString(),
                     UserId = user.Id,
                     JobTitle = "New Employee",
-                    Resource = "None"
+                    Resource = "None",
+                    StartDate = DateTime.UtcNow,
+                    EndDate = new DateTime(2099, 1, 1),
+                    IsActive = true
                 };
                 
                 await _context.UserAccountDomain.AddAsync(usrAccDomain);

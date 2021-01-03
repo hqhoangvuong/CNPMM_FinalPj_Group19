@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using HRM.API.Helpers;
 using HRM.API.RequestModel;
 using HRM.API.ViewModels;
 using HRM.Core.Data;
@@ -26,12 +27,14 @@ namespace HRM.API.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<User> _userManager;
         private readonly IMapper _mapper;
+        private TimesheetHelper _helper;
 
         public TimesheetController( ApplicationDbContext context, UserManager<User> userManager, IMapper mapper)
         {
             _context = context;
             _userManager = userManager;
             _mapper = mapper;
+            _helper = new TimesheetHelper(_context, _userManager, _mapper);
         }
 
         [HttpGet()]
@@ -51,25 +54,63 @@ namespace HRM.API.Controllers
 
         [HttpGet("bymonth")]
         [ProducesResponseType(typeof(List<TimesheetViewModel>), 200)]
-        public async Task<IActionResult> GetTimeSheetByMonth(CancellationToken token, int month)
+        public async Task<IActionResult> GetTimeSheetByMonth(CancellationToken token, DateTime month, string userId)
         {
-            var currentUser = await _context.Users.FindAsync(User.GetId());
+            User currentUser;
+                if (string.IsNullOrEmpty(userId) || userId == "-1")
+                currentUser = await _context.Users.FindAsync(User.GetId());
+            else
+            {
+                currentUser = new User()
+                {
+                    Id = userId
+                };
+            }
 
             var timesheets = await _context.Timesheets
-                .Where(o => o.UserId == currentUser.Id && o.StartDate.Month == month)
+                .Where(o => o.UserId == currentUser.Id && (o.StartDate.Month == month.Month || o.EndDate.Month == month.Month))
                 .OrderBy(o => o.StartDate)
                 .ProjectTo<TimesheetViewModel>(_mapper.ConfigurationProvider)
                 .ToListAsync(token);
 
-            return Ok(timesheets);
+            if(timesheets.Count > 0)
+            {
+                var startDateOfMonth = new DateTime(month.Year, month.Month, 1);
+                var endDateOfMonth = startDateOfMonth.AddMonths(1).AddDays(-1);
+
+                if (timesheets[0].StartDate.Date > startDateOfMonth)
+                {
+                    var resultStart = _helper.GetTimesheetSittedBetweenFunction(currentUser.Id, timesheets[0].StartDate);
+                    if (resultStart != null)
+                    {
+                        timesheets.Insert(0, _mapper.Map<TimesheetViewModel>(resultStart));
+                    }
+                }
+
+                if (timesheets[timesheets.Count - 1].EndDate.Date < endDateOfMonth)
+                {
+                    var resultEnd = _helper.GetTimesheetSittedBetweenFunction(currentUser.Id, timesheets[timesheets.Count - 1].EndDate);
+                    if (resultEnd != null)
+                    {
+                        timesheets.Add(_mapper.Map<TimesheetViewModel>(resultEnd));
+                    }
+                }
+
+                return Ok(timesheets);
+            }
+            else
+            {
+                return Ok();
+            }
         }
 
         [HttpPost("add")]
-        [ProducesResponseType(typeof(TimesheetRequestModel), (200))]
+        [ProducesResponseType(typeof(TimesheetRequestModel), (204))]
         public async Task<IActionResult> AddTimesheet([FromBody] TimesheetRequestModel model)
         {
             Timesheet result = await _context.Timesheets.FirstOrDefaultAsync(x => 
-                                    x.UserId == model.UserId && x.StartDate.Date == model.StartDate.Date && x.EndDate.Date == model.EndDate.Date ) ?? null;
+                                    x.UserId == model.UserId && x.StartDate.Date == model.StartDate.Date && 
+                                    x.EndDate.Date == model.EndDate.Date ) ?? null;
 
             if(result != null)
             {
@@ -181,6 +222,36 @@ namespace HRM.API.Controllers
             {
                 return BadRequest("Nothing has been push here!");
             }
+        }
+
+        [HttpGet("getsittedbetween")]
+        [ProducesResponseType(typeof(TimesheetRequestModel), 200)]
+        public async Task<IActionResult> GetTimesheetSittedBetween(string usrId, DateTime targetDate)
+        {
+            var targetTick = targetDate.Ticks;
+            var userTimesheet = await _context.Timesheets.Where(x => x.UserId == usrId).ToListAsync();
+
+            if(userTimesheet != null)
+            {
+                foreach(var timesheet in userTimesheet)
+                {
+                    if(targetTick > timesheet.StartDate.Ticks && targetTick < timesheet.EndDate.Ticks)
+                    {
+                        return Ok(_mapper.Map<TimesheetRequestModel>(timesheet));
+                    }
+                }
+            }
+
+            return BadRequest("Not found!");
+        }
+
+        [HttpGet("getoverview")]
+        [ProducesResponseType(typeof(UserTimesheetOverViewViewModel), 200)]
+        public async Task<IActionResult> GetTimesheetOverView(string usrId, DateTime month)
+        {
+            var result = await _helper.UserTimesheetOverView(usrId, month);
+
+            return Ok(result);
         }
     }
 }
